@@ -20,13 +20,13 @@ goto :next_download
 
 :start_exe
 ::do stuff here after downloaded and setup
-echo here
-pause
+
+set "PATH=%PATH%;%root_path:"=%"
+
 :: Get IP Address with CURL
 for /F %%I in ('
-%root_path:"=%curl.exe "https://checkip.amazonaws.com/" 2^>Nul
+curl.exe "https://checkip.amazonaws.com/" 2^>Nul
 ') do set ip=%%I
-pause
 FOR /F "tokens=1,2,3,4 delims=." %%i in ("%ip%") do (
 set one=%%i
 set two=%%j
@@ -34,6 +34,7 @@ set three=%%k
 set four=%%l
 )
 set reverseip=%four%.%three%.%two%.%one%
+
 ::add your spam check lists here
 (
 echo zen.spamhaus.org
@@ -45,9 +46,10 @@ echo bl.spamcop.net
 set dig_dns=
 set dig_output=
 for /F "tokens=*" %%a in (%~n0-temp.txt) do (
+echo Input: dig.exe %dig_dns% ^+short %reverseip%.%%a
 for /F %%I in ('
-%root_path:"=%dig.exe %dig_dns% ^+short %reverseip%.%%a
-') do set dig_output=%%I
+dig.exe %dig_dns% ^+short %reverseip%.%%a
+') do set dig_output=%%I && echo Output: %%I
 if "!dig_output!" == "" (break)
 )
 if "!dig_output!" == "" (set dig_output=null)
